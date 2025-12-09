@@ -6,7 +6,7 @@ import { CardModal } from "./components/events/event-modal"
 import { AdminPanel } from "./components/admin-panel/admin-panel"
 
 export const App: FC = () => {
-  const [navStatus, setNavStatus] = useState<'registration' | 'login' | 'help' | null>(null)
+  const [navStatus, setNavStatus] = useState<'register' | 'login' | 'help' | null>(null)
   const [showModal, setShowModal] = useState<boolean>(false)
 
   const [email, setEmail] = useState<string | null>(null)
@@ -45,7 +45,7 @@ export const App: FC = () => {
             </button>
             <button
               className="nav-btn primary"
-              onClick={() => { setNavStatus('registration'); setShowModal(true) }}
+              onClick={() => { setNavStatus('register'); setShowModal(true) }}
             >
               Зарегистрироваться
             </button>

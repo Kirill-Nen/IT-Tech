@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type Dispatch, type FC, type FormEvent, ty
 import './modal.css'
 
 type ModalTypeProps = {
-    status: 'registration' | 'login' | 'help',
+    status: 'register' | 'login' | 'help',
     //setNavStatus: React.Dispatch<React.SetStateAction<"registration" | "login" | 'help' | null>>,
     setShowModal: Dispatch<SetStateAction<boolean>>
     setEmail: Dispatch<SetStateAction<string | null>>,
@@ -54,7 +54,7 @@ export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setEmail, setI
     //на беке проверяется на админа
     useEffect(() => {
         if (data !== null) {
-            fetch(`${status}`, { //
+            fetch(`http://127.0.0.1:8000/api/users/${status}`, { //
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -110,7 +110,7 @@ export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setEmail, setI
                     </div>
                     <button type="submit" className="submit-btn">Войти</button>
                 </div>}
-                {status === 'registration' && <div>
+                {status === 'register' && <div>
                     <h2>Регистрация</h2>
 
                     <div className="form-group">

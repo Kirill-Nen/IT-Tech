@@ -3,11 +3,12 @@ import './modal.css'
 
 type ModalTypeProps = {
     status: 'registration' | 'login' | 'help',
-    setNavStatus: React.Dispatch<React.SetStateAction<"registration" | "login" | 'help' | null>>,
+    //setNavStatus: React.Dispatch<React.SetStateAction<"registration" | "login" | 'help' | null>>,
     setShowModal: Dispatch<SetStateAction<boolean>>
+    setName: Dispatch<SetStateAction<string | null>>
 }
 
-export const Modal: FC<ModalTypeProps> = ({ status, setNavStatus, setShowModal }) => {
+export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setName }) => {
     const formRef = useRef<HTMLFormElement>(null)
 
     const [data, setData] = useState<Record<string, string> | null>(null)
@@ -30,7 +31,6 @@ export const Modal: FC<ModalTypeProps> = ({ status, setNavStatus, setShowModal }
 
 
         if (formDataObject.confirmPassword) {
-
             if (formDataObject.confirmPassword === formDataObject.password) {
                 setData(formDataObject)
             } else {
@@ -42,13 +42,16 @@ export const Modal: FC<ModalTypeProps> = ({ status, setNavStatus, setShowModal }
     }
 
     useEffect(() => {
-        fetch(`${status}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-            .then(res => res.json())
-            .then(data_res => console.log(data_res))
+        if (data !== null) {
+            fetch(`${status}`, { //
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(data_res => console.log(data_res))
+                //setName и логика авторизации
+        }
     }, [data])
 
     return (

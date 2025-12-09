@@ -1,18 +1,23 @@
 import { useEffect, useState } from "react"
 
 export type ActiveEvent = {
+    id: number
     name: string,
-    img: URL | string,
+    img: string,
     dates: {
-        start: Date,
-        end: Date
+        start: string,
+        end: string
     },
     people: number,
     status: 'active' | 'end',
-    price: number
+    price: number | 'free',
+    current_participants: number,
+    max_participantsl: number,
+    isParticipantslLimited: boolean
+    user_status: boolean
 }
 
-export const usePromise = (url: string, type: string) => {
+export const usePromise = (url: string, type: string, isLogin: boolean) => {
     const [activeEvents, setActiveEvents] = useState<ActiveEvent[]>([])
     const [error, setError] = useState<string | null>(null)
 
@@ -22,11 +27,14 @@ export const usePromise = (url: string, type: string) => {
         const fetchData = async() => {
             try {
                 const response = await fetch(url, {
-                    method: 'GET', 
+                    method: 'POST', 
                     headers: {
                         'Content-Type': 'application/json',
-                        'type': type
                     },
+                    body: JSON.stringify({
+                        type: type,
+                        isLogin: isLogin
+                    }),
                     signal: abortController.signal
                 })
 

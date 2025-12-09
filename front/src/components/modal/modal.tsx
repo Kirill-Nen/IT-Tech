@@ -5,10 +5,20 @@ type ModalTypeProps = {
     status: 'registration' | 'login' | 'help',
     //setNavStatus: React.Dispatch<React.SetStateAction<"registration" | "login" | 'help' | null>>,
     setShowModal: Dispatch<SetStateAction<boolean>>
-    setName: Dispatch<SetStateAction<string | null>>
+    setEmail: Dispatch<SetStateAction<string | null>>,
+    setIsLogin: Dispatch<SetStateAction<boolean>>,
+    setRole: React.Dispatch<React.SetStateAction<"admin" | "user" | null>>
 }
 
-export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setName }) => {
+type Answer = {
+    success: boolean,
+    token: string,
+    email: string,
+    isLogin: boolean,
+    role: 'admin' | 'user'
+}
+
+export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setEmail, setIsLogin, setRole }) => {
     const formRef = useRef<HTMLFormElement>(null)
 
     const [data, setData] = useState<Record<string, string> | null>(null)
@@ -41,6 +51,7 @@ export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setName }) => 
         }
     }
 
+    //на беке проверяется на админа
     useEffect(() => {
         if (data !== null) {
             fetch(`${status}`, { //
@@ -48,9 +59,13 @@ export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setName }) => 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             })
-                .then(res => res.json())
-                .then(data_res => console.log(data_res))
-                //setName и логика авторизации
+                .then((res: Response): Promise<Answer> => res.json())
+                .then((data_res: Answer): void => {
+                    setEmail(data_res.email);
+                    setIsLogin(data_res.isLogin);
+                    setRole(data_res.role)
+                    localStorage.setItem('auth_token', data_res.token)
+                })
         }
     }, [data])
 
@@ -171,35 +186,35 @@ export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setName }) => 
                     </div>
                     <button type="submit" className="submit-btn">Зарегестрироваться</button>
                 </div>}
-                {status === 'help' && 
-                <div>
-                    <h2>Восстановление пароля</h2>
-                    <div className="form-group">
-                        <label htmlFor="register-email">Электронная почта</label>
-                        <input
-                            type="email"
-                            id="register-email"
-                            name="email"
-                            placeholder="example@mail.ru"
-                            required
-                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-                            title="Введите корректный email"
-                        />
-                        <div className="hint">Будет использоваться для входа</div>
-                    </div>
+                {status === 'help' &&
+                    <div>
+                        <h2>Восстановление пароля</h2>
+                        <div className="form-group">
+                            <label htmlFor="register-email">Электронная почта</label>
+                            <input
+                                type="email"
+                                id="register-email"
+                                name="email"
+                                placeholder="example@mail.ru"
+                                required
+                                pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                                title="Введите корректный email"
+                            />
+                            <div className="hint">Будет использоваться для входа</div>
+                        </div>
 
-                    <div className="form-group">
-                        <label htmlFor="check">Код</label>
-                        <input
-                            type="password"
-                            id="code"
-                            name="code"
-                            placeholder="Введите код"
-                            required
-                        />
-                    </div>
-                    <button type="submit" className="submit-btn">Восстановить пароль</button>
-                </div>}
+                        <div className="form-group">
+                            <label htmlFor="check">Код</label>
+                            <input
+                                type="password"
+                                id="code"
+                                name="code"
+                                placeholder="Введите код"
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="submit-btn">Восстановить пароль</button>
+                    </div>}
             </form>
         </div>
     )

@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState, type FC, type FormEvent, type ReactNode } from "react"
+import { useEffect, useRef, useState, type Dispatch, type FC, type FormEvent, type SetStateAction } from "react"
+import './modal.css'
 
 type ModalTypeProps = {
-    status: 'registration' | 'login'
+    status: 'registration' | 'login' | 'help',
+    setNavStatus: React.Dispatch<React.SetStateAction<"registration" | "login" | 'help' | null>>,
+    setShowModal: Dispatch<SetStateAction<boolean>>
 }
 
-export const Modal: FC<ModalTypeProps> = ({ status }) => {
+export const Modal: FC<ModalTypeProps> = ({ status, setNavStatus, setShowModal }) => {
     const formRef = useRef<HTMLFormElement>(null)
 
     const [data, setData] = useState<Record<string, string> | null>(null)
@@ -18,13 +21,24 @@ export const Modal: FC<ModalTypeProps> = ({ status }) => {
         }
 
         const formData = new FormData(formRef.current)
+
         const formDataObject: Record<string, string> = {}
 
         formData.forEach((value, key) => {
             formDataObject[key] = value.toString()
         })
 
-        setData(formDataObject)
+
+        if (formDataObject.confirmPassword) {
+
+            if (formDataObject.confirmPassword === formDataObject.password) {
+                setData(formDataObject)
+            } else {
+                alert('Пароли не совпадают')
+            }
+        } else {
+            setData(formDataObject)
+        }
     }
 
     useEffect(() => {
@@ -38,9 +52,10 @@ export const Modal: FC<ModalTypeProps> = ({ status }) => {
     }, [data])
 
     return (
-        <div>
+        <div className="modal">
+            <button className="close-btn" onClick={() => { setShowModal(false) }}>+</button>
             <form ref={formRef} onSubmit={btnSubmit}>
-                {status === 'login' ? <div>
+                {status === 'login' && <div>
                     <h2>Вход в аккаунт</h2>
 
                     <div className="form-group">
@@ -51,7 +66,7 @@ export const Modal: FC<ModalTypeProps> = ({ status }) => {
                             name="email"
                             placeholder="example@mail.ru"
                             required
-                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
                             title="Введите корректный email"
                         />
                         <div className="hint">Например: user@example.com</div>
@@ -71,13 +86,13 @@ export const Modal: FC<ModalTypeProps> = ({ status }) => {
                         <div className="hint">Минимум 6 символов</div>
                     </div>
 
-                    <button type="submit" className="submit-btn">Войти</button>
-
                     <div className="form-footer">
                         <a href="#" className="link">Забыли пароль?</a>
                         <span>Нет аккаунта? <a href="#" className="link">Зарегистрироваться</a></span>
                     </div>
-                </div> : <div>
+                    <button type="submit" className="submit-btn">Войти</button>
+                </div>}
+                {status === 'registration' && <div>
                     <h2>Регистрация</h2>
 
                     <div className="form-group">
@@ -102,7 +117,7 @@ export const Modal: FC<ModalTypeProps> = ({ status }) => {
                             name="email"
                             placeholder="example@mail.ru"
                             required
-                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
                             title="Введите корректный email"
                         />
                         <div className="hint">Будет использоваться для входа</div>
@@ -117,8 +132,7 @@ export const Modal: FC<ModalTypeProps> = ({ status }) => {
                             placeholder="••••••••"
                             required
                             minLength={6}
-                            pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$"
-                            title="Пароль должен содержать минимум 6 символов, включая буквы и цифры"
+                            title="Пароль должен содержать минимум 6 символов"
                         />
                         <div className="hint">Минимум 6 символов, буквы и цифры</div>
                     </div>
@@ -149,13 +163,40 @@ export const Modal: FC<ModalTypeProps> = ({ status }) => {
                         </label>
                     </div>
 
-                    <button type="submit" className="submit-btn">Зарегистрироваться</button>
-
                     <div className="form-footer">
                         <span>Уже есть аккаунт? <a href="#" className="link">Войти</a></span>
                     </div>
+                    <button type="submit" className="submit-btn">Зарегестрироваться</button>
                 </div>}
-                <button>{status === 'login' ? 'Войти' : 'Зарегистрироваться'}</button>
+                {status === 'help' && 
+                <div>
+                    <h2>Восстановление пароля</h2>
+                    <div className="form-group">
+                        <label htmlFor="register-email">Электронная почта</label>
+                        <input
+                            type="email"
+                            id="register-email"
+                            name="email"
+                            placeholder="example@mail.ru"
+                            required
+                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                            title="Введите корректный email"
+                        />
+                        <div className="hint">Будет использоваться для входа</div>
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="check">Код</label>
+                        <input
+                            type="password"
+                            id="code"
+                            name="code"
+                            placeholder="Введите код"
+                            required
+                        />
+                    </div>
+                    <button type="submit" className="submit-btn">Восстановить пароль</button>
+                </div>}
             </form>
         </div>
     )

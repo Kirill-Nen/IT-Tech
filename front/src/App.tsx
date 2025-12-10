@@ -15,10 +15,16 @@ export const App: FC = () => {
 
   const [type, setType] = useState<'active' | 'ended' | 'my'>('my')
 
-  if (localStorage.getItem('auth_token')) {
-    setIsLogin(true)
-    //нужно email
-  }
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      setIsLogin(true);
+
+      fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => res.json())
+        .then(data => setEmail(data.email))
+    }
+  }, []);
 
   const { activeEvents, error } = usePromise('', type, isLogin)//получение событий
 
@@ -83,9 +89,8 @@ export const App: FC = () => {
 
           {!isLogin && type === 'my' ? <p>Вы не зарегистрировались</p> : (<div className="events-grid">
             {activeEvents.map((i) => {
-              setActiveCard(i)
               return (
-                <div key={i.id} className="event-card-placeholder" onClick={() => { setVisibleCard(true) }}>
+                <div key={i.id} className="event-card-placeholder" onClick={() => { setActiveCard(i); setVisibleCard(true) }}>
                   <img src="" alt="" />
                   <h3>{i.name}</h3>
                   <p>Начало: {new Date(i.dates.start).toLocaleDateString()}</p>
@@ -97,7 +102,7 @@ export const App: FC = () => {
           </div>)}
         </div>
       </div>
-      {navStatus && showModal && <Modal status={navStatus} setShowModal={setShowModal} setEmail={setEmail} setIsLogin={setIsLogin} setRole={setRole}/>}
+      {navStatus && showModal && <Modal status={navStatus} setShowModal={setShowModal} setEmail={setEmail} setIsLogin={setIsLogin} setRole={setRole} />}
       {role === 'admin' && <AdminPanel />}
       {visibleCard && <CardModal info={activeCard} setVisible={setVisibleCard} name={email} />}
     </div>

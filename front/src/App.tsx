@@ -26,7 +26,7 @@ export const App: FC = () => {
     if (token) {
       setIsLogin(true);
 
-      fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } })
+      fetch('http://127.0.0.1:8000/api/users/me', { headers: { Authorization: `Bearer ${token}` } })
         .then((res: Response): Promise<afterLoad> => res.json())
         .then((data: afterLoad): void => {
           if (!data.isVerifed) {

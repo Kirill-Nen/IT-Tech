@@ -1,4 +1,3 @@
-// AdminModal.tsx
 import { useState, useEffect, type FC } from 'react';
 import './admin-modal.css';
 import type { AdminObject, FieldConfig, AdminEditModalProps } from './types/admin';

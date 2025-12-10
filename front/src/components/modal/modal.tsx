@@ -64,6 +64,7 @@ export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setEmail, setI
                     setEmail(data_res.email);
                     setIsLogin(data_res.isLogin);
                     setRole(data_res.role)
+                    setShowModal(false)
                     localStorage.setItem('auth_token', data_res.token)
                 })
         }

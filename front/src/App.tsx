@@ -5,6 +5,11 @@ import { usePromise, type ActiveEvent } from "./utils/usePromise"
 import { CardModal } from "./components/events/event-modal"
 import { AdminPanel } from "./components/admin-panel/admin-panel"
 
+type afterLoad = {
+  role: 'admin' | 'user',
+  email: string
+}
+
 export const App: FC = () => {
   const [navStatus, setNavStatus] = useState<'register' | 'login' | 'help' | null>(null)
   const [showModal, setShowModal] = useState<boolean>(false)
@@ -21,8 +26,11 @@ export const App: FC = () => {
       setIsLogin(true);
 
       fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } })
-        .then(res => res.json())
-        .then(data => setEmail(data.email))
+        .then((res: Response): Promise<afterLoad> => res.json())
+        .then((data: afterLoad): void => {
+          setEmail(data.email); 
+          setRole(data.role)
+        })
     }
   }, []);
 

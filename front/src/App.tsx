@@ -7,7 +7,8 @@ import { AdminPanel } from "./components/admin-panel/admin-panel"
 
 type afterLoad = {
   role: 'admin' | 'user',
-  email: string
+  email: string,
+  isVerifed: boolean
 }
 
 export const App: FC = () => {
@@ -28,8 +29,37 @@ export const App: FC = () => {
       fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } })
         .then((res: Response): Promise<afterLoad> => res.json())
         .then((data: afterLoad): void => {
-          setEmail(data.email); 
-          setRole(data.role)
+          if (!data.isVerifed) {
+            const codeCheck: string | null = prompt('Вам на почту отправлен код. Введите его сюда', '')
+
+            if (codeCheck !== null) {
+              fetch('', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                  code: codeCheck
+                })
+              })
+                .then((response: Response): Promise<{
+                  success: boolean,
+                }> => response.json())
+                .then((data: {
+                  success: boolean,
+                }): void => {
+                  if (data.success) {
+                    alert('Почта подтверждена')
+                  } else {
+                    alert('Ошибка. Попробуйте снова')
+                  }
+                })
+            }
+          } else {
+            setEmail(data.email);
+            setRole(data.role)
+          }
         })
     }
   }, []);

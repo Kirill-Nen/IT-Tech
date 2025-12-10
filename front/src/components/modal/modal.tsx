@@ -54,50 +54,83 @@ export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setEmail, setI
     //на беке проверяется на админа
     useEffect(() => {
         if (data !== null) {
-            fetch(`http://127.0.0.1:8000/api/users/${status}`, { //
+            fetch(`http://127.0.0.1:8000/api/users/${status}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             })
                 .then((res: Response): Promise<Answer> => res.json())
                 .then((data_res: Answer): void => {
-                    switch (status) {
-                        case 'login':
-                            setEmail(data_res.email);
-                            setIsLogin(data_res.isLogin);
-                            setRole(data_res.role)
-                            setShowModal(false)
-                            localStorage.setItem('auth_token', data_res.token)
-                            break;
-                        case 'register':
-                            const code: string | null = prompt('Вам на почту отправлен код. Введите его сюда', '')
+                    if (data_res.success) {
+                        switch (status) {
+                            case 'login':
+                                setEmail(data_res.email);
+                                setIsLogin(data_res.isLogin);
+                                setRole(data_res.role)
+                                setShowModal(false)
+                                localStorage.setItem('auth_token', data_res.token)
+                                break;
+                            case 'register':
+                                const code: string | null = prompt('Вам на почту отправлен код. Введите его сюда', '')
 
-                            if (code !== null) {
-                                fetch('', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({
-                                        code: code
+                                if (code !== null) {
+                                    fetch('', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            Authorization: `Bearer ${data_res.token}`
+                                        },
+                                        body: JSON.stringify({
+                                            code: code
+                                        })
                                     })
-                                })
-                                    .then((response: Response): Promise<Answer> => response.json())
-                                    .then((data: Answer): void => {
-                                        if (data.success) {
-                                            setEmail(data_res.email);
-                                            setIsLogin(data_res.isLogin);
-                                            setRole(data_res.role)
-                                            setShowModal(false)
-                                            localStorage.setItem('auth_token', data_res.token)
-                                        } else {
-                                            alert('Ошибка. Попробуйте снова')
-                                        }
+                                        .then((response: Response): Promise<{ success: boolean }> => response.json())
+                                        .then((data: { success: boolean }): void => {
+                                            if (data.success) {
+                                                setEmail(data_res.email);
+                                                setIsLogin(data_res.isLogin);
+                                                setRole(data_res.role)
+                                                setShowModal(false)
+                                                localStorage.setItem('auth_token', data_res.token)
+                                            } else {
+                                                alert('Ошибка. Попробуйте снова')
+                                            }
+                                        })
+                                }
+                                break;
+                            case 'help':
+                                const codeCheck: string | null = prompt('Вам на почту отправлен код. Введите его сюда', '')
+
+                                if (codeCheck !== null) {
+                                    fetch('', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            Authorization: `Bearer ${data_res.token}`
+                                        },
+                                        body: JSON.stringify({
+                                            code: codeCheck
+                                        })
                                     })
-                            }
-                            break;
-                        default:
-                            break;
+                                        .then((response: Response): Promise<{
+                                            success: boolean,
+                                            password: number
+                                        }> => response.json())
+                                        .then((data: {
+                                            success: boolean,
+                                            password: number
+                                        }): void => {
+                                            if (data.success) {
+                                                alert('Ваш пароль отправлен на почту')
+                                            } else {
+                                                alert('Ошибка. Попробуйте снова')
+                                            }
+                                        })
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 })
         }

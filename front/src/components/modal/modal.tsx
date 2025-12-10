@@ -61,11 +61,38 @@ export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setEmail, setI
             })
                 .then((res: Response): Promise<Answer> => res.json())
                 .then((data_res: Answer): void => {
-                    setEmail(data_res.email);
-                    setIsLogin(data_res.isLogin);
-                    setRole(data_res.role)
-                    setShowModal(false)
-                    localStorage.setItem('auth_token', data_res.token)
+                    switch (status) {
+                        case 'login':
+                            setEmail(data_res.email);
+                            setIsLogin(data_res.isLogin);
+                            setRole(data_res.role)
+                            setShowModal(false)
+                            localStorage.setItem('auth_token', data_res.token)
+                            break;
+                        case 'register':
+                            const code: string | null = prompt('Вам на почту отправлен код. Введите его сюда', '')
+
+                            if (code !== null) {
+                                fetch('')
+                                    .then((response: Response): Promise<Answer> => response.json())
+                                    .then((data: Answer): void => {
+                                        if (data.success) {
+                                            setEmail(data_res.email);
+                                            setIsLogin(data_res.isLogin);
+                                            setRole(data_res.role)
+                                            setShowModal(false)
+                                            localStorage.setItem('auth_token', data_res.token)
+                                        } else {
+                                            alert('Ошибка. Попробуйте снова')
+                                        }
+                                    })
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+
                 })
         }
     }, [data])

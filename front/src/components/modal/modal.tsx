@@ -73,7 +73,15 @@ export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setEmail, setI
                             const code: string | null = prompt('Вам на почту отправлен код. Введите его сюда', '')
 
                             if (code !== null) {
-                                fetch('')
+                                fetch('', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        code: code
+                                    })
+                                })
                                     .then((response: Response): Promise<Answer> => response.json())
                                     .then((data: Answer): void => {
                                         if (data.success) {
@@ -91,8 +99,6 @@ export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setEmail, setI
                         default:
                             break;
                     }
-
-
                 })
         }
     }, [data])
@@ -229,17 +235,6 @@ export const Modal: FC<ModalTypeProps> = ({ status, setShowModal, setEmail, setI
                                 title="Введите корректный email"
                             />
                             <div className="hint">Будет использоваться для входа</div>
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="check">Код</label>
-                            <input
-                                type="password"
-                                id="code"
-                                name="code"
-                                placeholder="Введите код"
-                                required
-                            />
                         </div>
                         <button type="submit" className="submit-btn">Восстановить пароль</button>
                     </div>}
